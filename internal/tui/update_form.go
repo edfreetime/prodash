@@ -53,7 +53,6 @@ func updateForm(m Model, msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			// SAVE DATA
 			newP := config.Project{
 				Name: m.form.name.Value(),
 				Path: m.form.path.Value(),
@@ -63,14 +62,33 @@ func updateForm(m Model, msg tea.Msg) (tea.Model, tea.Cmd) {
 				},
 			}
 
-			if m.selected >= 0 && m.selected < len(m.projects) {
-				m.projects[m.selected] = newP
-			} else {
-				m.projects = append(m.projects, newP)
+			// 1. Reload dulu dari file biar selalu up to date
+			latestCfg, err := config.Load()
+			if err != nil {
+				// kalau error, fallback ke state sekarang
+				latestCfg = m.cfg
 			}
 
-			m.cfg.Projects = m.projects
-			config.Save(m.cfg)
+			// 2. Pakai data terbaru
+			projects := latestCfg.Projects
+
+			if m.selected >= 0 && m.selected < len(projects) {
+				projects[m.selected] = newP
+			} else {
+				projects = append(projects, newP)
+			}
+
+			// 3. Assign balik
+			latestCfg.Projects = projects
+
+			// 4. Save
+			if err := config.Save(latestCfg); err != nil {
+				return m, nil
+			}
+
+			// 5. Update state TUI
+			m.cfg = latestCfg
+			m.projects = projects
 
 			m.mode = modeList
 			m.selected = -1
