@@ -1,0 +1,37 @@
+# Binaries
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+prodash
+
+# Go build
+/bin/
+/build/
+
+# Test output
+*.test
+*.out
+
+# Dependency directories
+/vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Config & local data
+projects.json
+config.json
